@@ -1,28 +1,14 @@
+from typing import Optional
 from app.models.user import User
-from app import db
+from app.repositories.base_repository import BaseRepository
 
-class UserRepository:
+class UserRepository(BaseRepository[User]):
     
-    def get_by_id(self, user_id):
-        return User.query.get(user_id)
+    def __init__(self):
+        super().__init__(User)
 
-    def get_by_username(self, username):
-        return User.query.filter_by(username=username).first()
+    def get_by_username(self, username: str) -> Optional[User]:
+        return self.model.query.filter_by(username=username).first()
 
-    def get_by_email(self, email):
-        return User.query.filter_by(email=email).first()
-
-    def get_all(self):
-        return User.query.all()
-
-    def create(self, user):
-        db.session.add(user)
-        db.session.commit()
-        return user
-
-    def delete(self, user):
-        db.session.delete(user)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
+    def get_by_email(self, email: str) -> Optional[User]:
+        return self.model.query.filter_by(email=email).first()
