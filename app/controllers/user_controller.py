@@ -17,19 +17,21 @@ class UserController:
 
     def get_all_users(self):
         users = self.service.get_all_users()
-        return self.user_list_schema.dump(users), 200
+        return jsonify(self.user_list_schema.dump(users)), 200
 
     def get_user_by_id(self, user_id):
         user = self.service.get_user_by_id(user_id)
         if not user:
             return jsonify({"message": "Usuário não encontrado"}), 404
-        return self.user_schema.dump(user), 200
+        return jsonify(self.user_schema.dump(user)), 200
 
     def create_user(self):
         data = request.get_json()
-        return self.service.create_user(data)
+        response, status_code = self.service.create_user(data)
+        return jsonify(response), status_code
 
     def delete_user(self, user_id):
-        return self.service.delete_user(user_id)
+        response, status_code = self.service.delete_user(user_id)
+        return jsonify(response), status_code
 
 user_controller = UserController()
