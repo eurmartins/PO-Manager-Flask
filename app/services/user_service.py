@@ -3,7 +3,7 @@ from marshmallow import ValidationError
 
 from app.repositories.user_repository import UserRepository
 from app.schemas.user_schemas import UserCreateSchema
-from app.models.user import User
+from app.models.user import User, RoleEnum
 
 class UserService:
     def __init__(self):
@@ -33,12 +33,23 @@ class UserService:
 
         if self.repository.get_by_email(validated_data["email"]):
             return {"message": "Email já em uso"}, 400
+        
+        try:
+            role_value = int(validated_data["role"])
+            if role_value == 0:
+                role = RoleEnum.CLIENTE
+            elif role_value == 1:
+                role = RoleEnum.ADMIN
+            else:
+                raise ValueError("Role inválido")
+        except ValueError:
+            return {"message": "Role inválido"}, 400
 
         user = User(
             username=validated_data["username"],
             password=validated_data["password"],
             email=validated_data["email"],
-            role=validated_data["role"]
+            role=role
         )
 
         created_user = self.repository.create(user)
